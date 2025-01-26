@@ -1,0 +1,104 @@
+import { Steps } from "nextra/components";
+
+# Installation
+
+Adding Nearby Settings to your app is easy. Just follow these steps to get started.
+
+<Steps>
+### Add required permissions for Nearby Connections
+
+These settings [are required to use Nearby Settings](https://developers.google.com/nearby/connections/android/get-started#request_permissions) in your app. Add the following permissions to your `AndroidManifest.xml` file:
+
+```xml
+<!-- Required for Nearby Connections -->
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+<uses-permission android:name="android.permission.BLUETOOTH" />
+<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:minSdkVersion="29"
+    android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:minSdkVersion="31"
+    android:name="android.permission.BLUETOOTH_ADVERTISE" />
+<uses-permission android:minSdkVersion="31"
+    android:name="android.permission.BLUETOOTH_CONNECT" />
+<uses-permission android:minSdkVersion="31"
+    android:name="android.permission.BLUETOOTH_SCAN" />
+<uses-permission android:minSdkVersion="32"
+    android:name="android.permission.NEARBY_WIFI_DEVICES" />
+```
+
+### Add Nearby Settings to your app
+
+Add the following dependency to your `build.gradle` file:
+
+```gradle
+
+```
+
+### Create a `NearbySettingsHost`
+
+Create a `NearbySettingsHost` in your app to handle the connection between your app and the mobile device. You can use the following code as a starting point:
+
+##### Define a schema
+
+```kotlin
+val defaultSchema = SettingsSchema(
+    schemaItems = listOf(
+        SettingSchema(
+            key = "text_input",
+            label = "Text Input",
+            type = SettingType.TEXT,
+        ),
+        SettingSchema(
+            key = "number_input",
+            label = "Number Input",
+            type = SettingType.NUMBER,
+        ),
+        SettingSchema(
+            key = "toggle_input",
+            label = "Toggle Input",
+            type = SettingType.TOGGLE,
+        ),
+        SettingSchema(
+            key = "select_input",
+            label = "Select Input",
+            type = SettingType.SELECT,
+            constraints = SettingConstraints(
+                options = listOf("option1", "option2", "option3")
+            )
+        ),
+        SettingSchema(
+            key = "multiselect_input",
+            label = "Multiselect Input",
+            type = SettingType.MULTI_SELECT,
+            constraints = SettingConstraints(
+                options = listOf("option1", "option2", "option3")
+            )
+        )
+    )
+);
+```
+
+##### Create a `NearbySettingsHost`
+
+```kotlin
+// Create a mutable state for the schema
+// so when the settings change it will reflect on the UI
+var schema by remember { mutableStateOf(defaultSchema) }
+
+val settingsHost = NearbySettingsHost(
+    settingsSchema = defaultSchema,
+    onSettingsChanged = { newSettings ->
+        schema = newSettings
+    },
+    context = this,
+    // If you want data to be stored persistently
+    // `NearbySettings` will store and retrieve it
+    enablePersistence = true,
+    // If you want to start advertising on start
+    automaticallyStart = true
+)
+```
+
+</Steps>

@@ -1,0 +1,62 @@
+import { LinkButton } from "@/components/Button";
+import { Github } from "lucide-react";
+import { Cards, Image, Callout } from "nextra/components";
+import { LatestRelease, StarBadge } from "@/components/badge";
+
+  <div
+    style={{
+      flex: 1,
+      display: "flex",
+      alignItems: "center",
+      alignContent: "center",
+      justifyContent: "center",
+      flexDirection: "column",
+    }}
+  >
+    <img src="/icon.png" width={100}/>
+
+    # Nearby Settings
+
+    <p>Quickly modify settings on nearby devices</p>
+
+  </div>
+   
+<LatestRelease />
+<StarBadge/>
+
+## About
+
+Nearby settings helps developers quickly build apps for Android TV that are configurable with mobile devices. It uses the Nearby Connections API to communicate with nearby devices and modify settings.
+
+## Features
+
+{" "}
+
+<Cards
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gap: "1rem",
+  }}
+>
+  <Cards.Card
+    icon={<span class="material-symbols-rounded">cloud_off</span>}
+    title="Fully Offline"
+    href="https://developers.google.com/nearby/connections/overview#introduction"
+  />
+  <Cards.Card
+    icon={<span class="material-symbols-rounded">build</span>}
+    title="Quickly build apps"
+    href="/installation"
+  />
+  <Cards.Card
+    icon={<span class="material-symbols-rounded">bolt</span>}
+    title="Active development"
+    href="https://github.com/Turtlepaw/clockwork/activity"
+  />
+  <Cards.Card
+    icon={<span class="material-symbols-rounded">public</span>}
+    title="Free and open-source"
+    href="https://github.com/Turtlepaw/clockwork"
+  />
+</Cards>
