@@ -1,5 +1,5 @@
 *.iml
-.gradle
+tv_core_old/.gradle
 /local.properties
 /.idea/caches
 /.idea/libraries
