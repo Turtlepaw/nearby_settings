@@ -20,5 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "TV Core"
-include(":app")
+include(":tv_core")
  

@@ -17,7 +17,7 @@
         android:name="android.permission.NEARBY_WIFI_DEVICES" />
 
     <application
-        android:label="nearby_settings"
+        android:label="Nearby Settings"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

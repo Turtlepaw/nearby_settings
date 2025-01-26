@@ -27,7 +27,7 @@ const config: DocsThemeConfig = {
       <>
         <title>{title}</title>
         <meta property="og:title" content={title} />
-        <link rel="icon" href="/clockwork_icon.png" sizes="any" />
+        <link rel="icon" href="/icon.png" sizes="any" />
       </>
     );
   },

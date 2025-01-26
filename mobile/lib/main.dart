@@ -149,6 +149,7 @@ class _HomePageState extends State<HomePage> {
             // in the middle of the parent.
             child: ListView(
           children: [
+            const SizedBox(height: 10),
             ...settingsClient.discoveredDevices.entries.map((entry) {
               final key = entry.key;
               final device = entry.value;

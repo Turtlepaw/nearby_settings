@@ -4,7 +4,7 @@ const page = {
   GitHub: {
     title: "GitHub",
     type: "page",
-    href: "https://github.com/Turtlepaw/clockwork",
+    href: "https://github.com/Turtlepaw/nearby_settings",
     newWindow: true,
   },
 };

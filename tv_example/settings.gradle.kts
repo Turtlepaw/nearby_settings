@@ -22,5 +22,5 @@ dependencyResolutionManagement {
 rootProject.name = "Nearby Settings Example"
 include(":app")
 include(":tv-core")
-project(":tv-core").projectDir = file("../tv-core")
+project(":tv-core").projectDir = file("../tv_core")
  

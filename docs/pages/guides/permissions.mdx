@@ -1,0 +1,14 @@
+# Permissions
+
+```gradle {2}
+dependencies {
+    implementation("com.google.accompanist:accompanist-permissions:0.37.0")
+}
+```
+
+```kotlin
+val permissions = rememberRequiredPermissions {}
+
+// Request all required permissions
+permissions.launchMultiplePermissionRequest()
+```

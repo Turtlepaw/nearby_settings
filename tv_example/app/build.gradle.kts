@@ -55,4 +55,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(project(":tv-core"))
+
+    implementation("com.google.accompanist:accompanist-permissions:0.37.0")
 }

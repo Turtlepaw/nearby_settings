@@ -32,7 +32,7 @@ import androidx.tv.material3.Text
 
 @Composable
 fun EmojiAuthDialog(
-    challenge: SettingsHost.EmojiChallenge,
+    challenge: NearbySettingsHost.EmojiChallenge,
     onEmojiSelected: (String) -> Unit
 ) {
     Dialog(onDismissRequest = {}) {
@@ -100,6 +100,6 @@ private fun EmojiOption(
 @Preview
 @Composable
 fun EmojiAuthDialogPreview() {
-    val challenge = SettingsHost.EmojiChallenge("😀", listOf("😀", "😎", "🎮"))
+    val challenge = NearbySettingsHost.EmojiChallenge("😀", listOf("😀", "😎", "🎮"))
     EmojiAuthDialog(challenge = challenge, onEmojiSelected = {})
 }

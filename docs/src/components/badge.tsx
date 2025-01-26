@@ -136,7 +136,7 @@ export function LatestRelease() {
     const fetchLatestRelease = async () => {
       try {
         const response = await fetch(
-          "https://api.github.com/repos/turtlepaw/clockwork/releases/latest"
+          "https://api.github.com/repos/turtlepaw/nearby_settings/releases/latest"
         );
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -179,7 +179,7 @@ export function StarBadge() {
     const fetchStars = async () => {
       try {
         const response = await fetch(
-          "https://api.github.com/repos/turtlepaw/clockwork"
+          "https://api.github.com/repos/turtlepaw/nearby_settings"
         );
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
