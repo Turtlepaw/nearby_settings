@@ -3,11 +3,12 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     kotlin("plugin.serialization") version "2.1.0"
+    id("maven-publish")
 }
 
 android {
     namespace = "com.turtlepaw.nearby_settings.tv_core"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 21
@@ -61,4 +62,26 @@ dependencies {
 
     // Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                groupId = "com.turtlepaw.nearby_settings"
+                artifactId = "tv_core"
+                version = "1.0"
+
+                // Manually specify the AAR file for publishing
+                artifact("${layout.buildDirectory}/outputs/aar/tv_core-release.aar")
+
+                // Include POM metadata (if needed)
+                pom {
+                    name.set("TV Core Library")
+                    description.set("A library for Nearby Settings on Android TV")
+                    url.set("https://github.com/turtlepaw/nearby-settings") // Example
+                }
+            }
+        }
+    }
 }

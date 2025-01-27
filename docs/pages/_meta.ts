@@ -1,6 +1,7 @@
 const page = {
   index: "Introduction",
   installation: "Installation",
+  guides: "Guides",
   GitHub: {
     title: "GitHub",
     type: "page",

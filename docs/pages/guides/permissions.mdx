@@ -1,10 +1,15 @@
 # Permissions
 
-```gradle {2}
+### Add accompanist permissions as a dependency
+
+```kts {3}
 dependencies {
+    // Add accompanist-permissions dependency
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
 }
 ```
+
+### Use `rememberRequiredPermissions` to request permissions
 
 ```kotlin
 val permissions = rememberRequiredPermissions {}
