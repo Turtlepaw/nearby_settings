@@ -54,7 +54,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation(project(":tv-core"))
+    //implementation(project(":tv-core"))
+    implementation("com.github.Turtlepaw.nearby_settings:tv_core:771060480c")
 
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
 }

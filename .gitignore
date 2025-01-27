@@ -13,3 +13,4 @@ tv_core_old/.gradle
 .externalNativeBuild
 .cxx
 local.properties
+tv_core/.idea/workspace.xml

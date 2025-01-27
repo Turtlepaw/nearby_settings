@@ -9,6 +9,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven { url = java.net.URI("https://jitpack.io") }
     }
 }
 dependencyResolutionManagement {
@@ -16,11 +17,12 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven { url = java.net.URI("https://jitpack.io") }
     }
 }
 
 rootProject.name = "Nearby Settings Example"
 include(":app")
-include(":tv-core")
-project(":tv-core").projectDir = file("../tv_core")
+//include(":tv-core")
+//project(":tv-core").projectDir = file("../tv_core")
  

@@ -21,6 +21,7 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import com.example.nearbysettingsexample.ui.theme.NearbySettingsExampleTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.turtlepaw
 
 val defaultSchema = SettingsSchema(
     schemaItems = listOf(

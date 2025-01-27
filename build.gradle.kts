@@ -3,13 +3,13 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.*
 
 allprojects {
-    version = "1.4"
-    group = "io.jitpack.gradle-modular"
+    version = "1.0"
+    group = "com.turtlepaw.nearby_settings"
 }
 
 subprojects {
     apply(plugin = "maven-publish")
-    extensions.configure<org.gradle.api.publish.PublishingExtension> {
+    extensions.configure<PublishingExtension> {
         publications {
             create<MavenPublication>("maven") {
                 groupId = project.group.toString()
