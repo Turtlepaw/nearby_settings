@@ -27,7 +27,7 @@ subprojects {
                     version = project.version.toString()
 
                     // Add this for Android libraries
-                    //from(components["release"])
+                    from(components.findByName("release"))
                 }
             }
         }
