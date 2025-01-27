@@ -26,8 +26,8 @@ subprojects {
                     artifactId = project.name
                     version = project.version.toString()
 
-                    artifact("${buildDir}/outputs/aar/tv_core-release.aar")
-                    
+                    artifact("${projectDir}/tv_core/build/outputs/aar/tv_core-release.aar")
+
                     // Add this for Android libraries
                     from(components.findByName("release"))
                 }
