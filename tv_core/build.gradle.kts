@@ -73,7 +73,7 @@ afterEvaluate {
                 version = "1.0"
 
                 // Manually specify the AAR file for publishing
-                artifact("${layout.buildDirectory}/outputs/aar/tv_core-release.aar")
+                artifact("${buildDir}/outputs/aar/tv_core-release.aar")
 
                 // Include POM metadata (if needed)
                 pom {
