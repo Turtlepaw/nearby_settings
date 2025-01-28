@@ -101,4 +101,17 @@ val settingsHost = NearbySettingsHost(
 )
 ```
 
+<details>
+<summary>If you're using Jetpack Compose, remember to add a `remember` block to the `NearbySettingsHost`</summary>
+
+```kotlin
+val settingsHost = remember {
+    NearbySettingsHost(
+        // ...
+    )
+}
+```
+
+</details>
+
 </Steps>

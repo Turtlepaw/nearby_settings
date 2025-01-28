@@ -36,7 +36,7 @@ class NearbySettingsHost(
             // Assuming rawAuthenticationToken is a ByteArray
             val authEmoji = convertDigitsToEmoji(info.authenticationToken)
 
-            Log.d("SettingsHost", "onConnectionInitiated: $authEmoji")
+            Log.d(TAG, "onConnectionInitiated: $authEmoji")
 
             // Show emoji selection UI
             showAuthScreen.value = true
@@ -85,8 +85,10 @@ class NearbySettingsHost(
     private var currentEndpointId: String? = null
     private var currentChallenge: EmojiChallenge? = null
     private val showAuthScreen = mutableStateOf(false)
+    // Change to private backing field
     private val _isAdvertising = mutableStateOf(false)
-    val isAdvertising: MutableState<Boolean> get() = _isAdvertising
+    // Expose as State<Boolean> instead of MutableState<Boolean>
+    val isAdvertising: State<Boolean> get() = _isAdvertising
 
     init {
         // Optionally load previously saved settings
@@ -128,16 +130,16 @@ class NearbySettingsHost(
             advertisingOptions
         ).addOnSuccessListener {
             _isAdvertising.value = true
-            Log.d("SettingsHost", "Advertising started, state updated: ${_isAdvertising.value}")
+            Log.d(TAG, "Advertising started, state updated: ${_isAdvertising.value}")
         }.addOnFailureListener {
             _isAdvertising.value = false
-            Log.e("SettingsHost", "Failed to start advertising", it)
+            Log.e(TAG, "Failed to start advertising", it)
         }.addOnCanceledListener {
             _isAdvertising.value = false
-            Log.e("SettingsHost", "Advertising canceled")
+            Log.e(TAG, "Advertising canceled")
         }
 
-        Log.d("SettingsHost", "Advertising started")
+        Log.d(TAG, "Advertising started")
     }
 
     fun stopAdvertising() {
@@ -147,7 +149,7 @@ class NearbySettingsHost(
 
         nearby.stopAdvertising()
         _isAdvertising.value = false
-        Log.d("SettingsHost", "Advertising stopped")
+        Log.d(TAG, "Advertising stopped")
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -167,15 +169,15 @@ class NearbySettingsHost(
 
                 task.addOnSuccessListener {
                     _isAdvertising.value = true
-                    Log.d("SettingsHost", "Advertising started, state updated: ${_isAdvertising.value}")
+                    Log.d(TAG, "Advertising started, state updated: ${_isAdvertising.value}")
                     continuation.resume(true)
                 }.addOnFailureListener { exception ->
                     _isAdvertising.value = false
-                    Log.e("SettingsHost", "Failed to start advertising", exception)
+                    Log.e(TAG, "Failed to start advertising", exception)
                     continuation.resumeWithException(exception)
                 }.addOnCanceledListener {
                     _isAdvertising.value = false
-                    Log.e("SettingsHost", "Advertising canceled")
+                    Log.e(TAG, "Advertising canceled")
                     continuation.cancel()
                 }
 
@@ -183,7 +185,7 @@ class NearbySettingsHost(
                     try {
                         stopAdvertising()
                     } catch (e: Exception) {
-                        Log.e("SettingsHost", "Failed to cancel advertising", e)
+                        Log.e(TAG, "Failed to cancel advertising", e)
                     }
                 }
             }
@@ -192,7 +194,7 @@ class NearbySettingsHost(
             throw e
         }
 
-        Log.d("SettingsHost", "Advertising started")
+        Log.d(TAG, "Advertising started")
     }
 
     suspend fun stopAdvertisingSuspend() {
@@ -203,7 +205,7 @@ class NearbySettingsHost(
         withContext(Dispatchers.IO) {
             nearby.stopAdvertising()
             _isAdvertising.value = false
-            Log.d("SettingsHost", "Advertising stopped")
+            Log.d(TAG, "Advertising stopped")
         }
     }
 
@@ -296,6 +298,10 @@ class NearbySettingsHost(
                 activity, getRequiredPermissions().toTypedArray(), requestCode
             );
         }
+    }
+
+    companion object {
+        private const val TAG = "NearbySettingsHost"
     }
 }
 

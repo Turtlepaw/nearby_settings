@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Nearby Settings"
 include(":tv_core")
+include(":example")

@@ -39,6 +39,9 @@ android {
 }
 
 dependencies {
+    // M3 Mobile
+    implementation("androidx.compose.material3:material3")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(platform(libs.androidx.compose.bom))
@@ -55,7 +58,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //implementation(project(":tv-core"))
-    implementation("com.github.Turtlepaw:nearby_settings:81112d0ffd")
+    //implementation("com.github.Turtlepaw:nearby_settings:940eb64417")
+    implementation(project(":tv_core"))
 
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
 }

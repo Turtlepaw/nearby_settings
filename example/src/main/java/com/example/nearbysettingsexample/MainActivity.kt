@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.tv.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Button
 import androidx.tv.material3.Card
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import com.example.nearbysettingsexample.ui.theme.NearbySettingsExampleTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -36,6 +39,7 @@ import com.turtlepaw.nearby_settings.tv_core.SettingSchema
 import com.turtlepaw.nearby_settings.tv_core.SettingType
 import com.turtlepaw.nearby_settings.tv_core.SettingsSchema
 import com.turtlepaw.nearby_settings.tv_core.rememberRequiredPermissions
+import kotlinx.coroutines.launch
 
 val defaultSchema = SettingsSchema(
     schemaItems = listOf(
@@ -81,19 +85,30 @@ class MainActivity : ComponentActivity() {
         setContent {
             var schema by remember { mutableStateOf(defaultSchema) }
 
-            val settingsHost = NearbySettingsHost(
-                settingsSchema = defaultSchema,
-                onSettingsChanged = { newSettings ->
-                    Log.d("SettingsHost", "New settings: $newSettings")
-                    schema = newSettings
-                },
-                context = this,
-                enablePersistence = true,
-                automaticallyStart = true
-            )
+            val settingsHost = remember {
+                NearbySettingsHost(
+                    settingsSchema = defaultSchema,
+                    onSettingsChanged = { newSettings ->
+                        Log.d("SettingsHost", "New settings: $newSettings")
+                        schema = newSettings
+                    },
+                    context = this,
+                    enablePersistence = true,
+                    automaticallyStart = false
+                )
+            }
 
             val isAdvertising by settingsHost.isAdvertising
             var isAdvertisingLoading by remember { mutableStateOf(false) }
+            val coroutineScope = rememberCoroutineScope()
+
+            DisposableEffect(isAdvertising) {
+                Log.d("MainActivity", "isAdvertising: $isAdvertising")
+                if (isAdvertising) {
+                    isAdvertisingLoading = false
+                }
+                onDispose { }
+            }
 
             NearbySettingsExampleTheme {
                 val permissions = rememberRequiredPermissions {}
@@ -113,13 +128,22 @@ class MainActivity : ComponentActivity() {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
+                        enabled = !isAdvertisingLoading,
                         onClick = {
                             if (permissions.allPermissionsGranted) {
-                                isAdvertisingLoading = true
-                                if (!isAdvertising) {
-                                    settingsHost.startAdvertising()
-                                } else {
-                                    settingsHost.stopAdvertising()
+                                coroutineScope.launch {
+                                    isAdvertisingLoading = true
+                                    if (!isAdvertising) {
+                                        try {
+                                            settingsHost.startAdvertisingSuspend()
+                                        } catch (e: Exception) {
+                                            Log.e("MainActivity", "Error starting advertising", e)
+                                            isAdvertisingLoading = false
+                                        }
+                                    } else {
+                                        settingsHost.stopAdvertisingSuspend()
+                                    }
+                                    isAdvertisingLoading = false
                                 }
                             } else {
                                 if (permissions.shouldShowRationale)
@@ -140,6 +164,15 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     ) {
+                        if (isAdvertisingLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                color = LocalContentColor.current,
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+
                         Text(
                             text = if (!permissions.allPermissionsGranted) "Grant Permissions" else if (isAdvertising) "Stop Advertising" else "Start Advertising"
                         )
@@ -147,6 +180,13 @@ class MainActivity : ComponentActivity() {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    Text(
+                        text = "Settings",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
                     schema.schemaItems.forEach { setting ->
                         Column(
                             modifier = Modifier
@@ -162,6 +202,7 @@ class MainActivity : ComponentActivity() {
                             Text(
                                 text = setting.label,
                                 style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
 
                             Spacer(modifier = Modifier.height(2.dp))
@@ -170,7 +211,8 @@ class MainActivity : ComponentActivity() {
                             Text(
                                 text = setting.value ?: "No value set",
                                 style = MaterialTheme.typography.bodyMedium,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }

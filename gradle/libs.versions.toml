@@ -31,6 +31,7 @@ play-services-location = { module = "com.google.android.gms:play-services-locati
 play-services-nearby = { module = "com.google.android.gms:play-services-nearby", version.ref = "playServicesNearby" }
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version = "8.3.2" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

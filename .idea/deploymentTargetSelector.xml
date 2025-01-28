@@ -2,9 +2,9 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="app">
+      <SelectionState runConfigName="Nearby_Settings.example">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-01-26T01:12:46.062048700Z">
+        <DropdownSelection timestamp="2025-01-28T03:04:47.338846900Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=5edbad46" />
