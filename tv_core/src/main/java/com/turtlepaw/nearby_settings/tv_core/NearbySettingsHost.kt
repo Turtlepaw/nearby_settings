@@ -25,7 +25,7 @@ class NearbySettingsHost(
     private val onSettingsChanged: (SettingsSchema) -> Unit,
     val context: Context,
     private val enablePersistence: Boolean = false,
-    private val automaticallyStart: Boolean = false
+    automaticallyStart: Boolean = false
 ) {
     private val settingsManager = SettingsManager(context)
     private val appId = "com.turtlepaw.nearby_settings"
@@ -242,6 +242,7 @@ class NearbySettingsHost(
 
 
     private fun sendSchema(endpointId: String) {
+        Log.d(TAG, "Sending schema to $endpointId, schema: $settingsSchema")
         val schemaBytes = Json.encodeToString(settingsSchema)
             .toByteArray(Charsets.UTF_8)
 

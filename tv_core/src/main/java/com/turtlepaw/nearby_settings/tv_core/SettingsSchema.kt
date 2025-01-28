@@ -36,6 +36,9 @@ data class SettingSchema(
     val defaultValue: String? = null,
     val value: String? = defaultValue, // New field to store current value
     val constraints: SettingConstraints? = null,
+    /**
+     * Description of the setting. Markdown is supported.
+     */
     val description: String? = null,
     val required: Boolean = false
 )

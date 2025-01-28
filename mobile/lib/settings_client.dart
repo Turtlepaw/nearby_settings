@@ -88,15 +88,21 @@ class SettingsClient with ChangeNotifier {
     }
 
 // Check Bluetooth Status
-    if (!await Permission.bluetooth.serviceStatus.isEnabled) {}
+    if (!await Permission.bluetooth.serviceStatus.isEnabled) {
+      // TODO: open bluetooth settings
+    }
 
     if (!await Permission.nearbyWifiDevices.isGranted) {
       await Permission.nearbyWifiDevices.request();
     }
+
+    return;
   }
 
   Future<void> startDiscovery(BuildContext context) async {
     try {
+      await requestPermissions();
+
       discoveredDevices = {};
 
       final success = await _nearby.startDiscovery(

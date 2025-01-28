@@ -46,6 +46,7 @@ val defaultSchema = SettingsSchema(
         SettingSchema(
             key = "text_input",
             label = "Text Input",
+            description = "**Markdown** *is* supported!",
             type = SettingType.TEXT,
         ),
         SettingSchema(

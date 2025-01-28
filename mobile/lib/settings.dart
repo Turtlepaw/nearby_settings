@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:nearby_settings/schema.dart';
 import 'package:nearby_settings/settings_client.dart';
 import 'package:provider/provider.dart';
@@ -111,7 +112,6 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final provider = Provider.of<SettingsClient>(context);
     final schema = provider.schema;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -152,7 +152,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
-                        setting.description!,
+                        "desk",
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
