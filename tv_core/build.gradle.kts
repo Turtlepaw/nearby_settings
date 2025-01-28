@@ -3,7 +3,11 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     kotlin("plugin.serialization") version "2.1.0"
+    id("maven-publish")
 }
+
+group = "com.github.turtlepaw"
+version = "1.0"
 
 android {
     namespace = "com.turtlepaw.nearby_settings.tv_core"
@@ -67,4 +71,17 @@ dependencies {
 
     // Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from(components["release"])
+                groupId = "com.github.turtlepaw"
+                artifactId = "tv_core"
+                version = "1.0"
+            }
+        }
+    }
 }
