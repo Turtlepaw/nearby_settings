@@ -13,6 +13,12 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class NearbySettingsHost(
     private var settingsSchema: SettingsSchema,
@@ -142,6 +148,63 @@ class NearbySettingsHost(
         nearby.stopAdvertising()
         _isAdvertising.value = false
         Log.d("SettingsHost", "Advertising stopped")
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun startAdvertisingSuspend() {
+        val advertisingOptions = AdvertisingOptions.Builder()
+            .setStrategy(Strategy.P2P_POINT_TO_POINT)
+            .build()
+
+        try {
+            suspendCancellableCoroutine<Boolean> { continuation ->
+                val task = nearby.startAdvertising(
+                    Build.MODEL,
+                    appId,
+                    connectionLifecycleCallback,
+                    advertisingOptions
+                )
+
+                task.addOnSuccessListener {
+                    _isAdvertising.value = true
+                    Log.d("SettingsHost", "Advertising started, state updated: ${_isAdvertising.value}")
+                    continuation.resume(true)
+                }.addOnFailureListener { exception ->
+                    _isAdvertising.value = false
+                    Log.e("SettingsHost", "Failed to start advertising", exception)
+                    continuation.resumeWithException(exception)
+                }.addOnCanceledListener {
+                    _isAdvertising.value = false
+                    Log.e("SettingsHost", "Advertising canceled")
+                    continuation.cancel()
+                }
+
+                continuation.invokeOnCancellation {
+                    try {
+                        stopAdvertising()
+                    } catch (e: Exception) {
+                        Log.e("SettingsHost", "Failed to cancel advertising", e)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            _isAdvertising.value = false
+            throw e
+        }
+
+        Log.d("SettingsHost", "Advertising started")
+    }
+
+    suspend fun stopAdvertisingSuspend() {
+        if (_isAdvertising.value == false) {
+            throw IllegalStateException("Can't stop advertising when not advertising")
+        }
+
+        withContext(Dispatchers.IO) {
+            nearby.stopAdvertising()
+            _isAdvertising.value = false
+            Log.d("SettingsHost", "Advertising stopped")
+        }
     }
 
     private fun generateEmojiChallenge(): Pair<String, List<String>> {
