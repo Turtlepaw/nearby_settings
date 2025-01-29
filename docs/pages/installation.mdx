@@ -1,4 +1,4 @@
-import { Steps } from "nextra/components";
+import { Steps, Tabs } from "nextra/components";
 
 # Installation
 
@@ -32,9 +32,56 @@ These settings [are required to use Nearby Settings](https://developers.google.c
 
 Add the following dependency to your `build.gradle` file:
 
-```gradle
+<details>
+<summary>Add the JitPack repository to your build file, if you haven't already.</summary>
 
+<Tabs items={['build.gradle.kts', 'build.gradle']}>
+  <Tabs.Tab>
+  
+  ```kotlin {5}
+	dependencyResolutionManagement {
+		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+		repositories {
+			mavenCentral()
+            maven { url = java.net.URI("https://jitpack.io") }
+		}
+	}
 ```
+</Tabs.Tab>
+  <Tabs.Tab>
+  
+  ```gradle {5}
+	dependencyResolutionManagement {
+		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+		repositories {
+			mavenCentral()
+			maven { url 'https://jitpack.io' }
+		}
+	}
+```
+</Tabs.Tab>
+</Tabs>
+
+</details>
+
+<Tabs items={['build.gradle.kts', 'build.gradle']}>
+  <Tabs.Tab>
+  
+```kotlin {2}
+	dependencies {
+	        implementation("com.github.Turtlepaw:nearby_settings:1.0.0")
+	}
+```
+</Tabs.Tab>
+  <Tabs.Tab>
+  
+```gradle {2}
+	dependencies {
+	        implementation 'com.github.Turtlepaw:nearby_settings:1.0.0'
+	}
+```
+</Tabs.Tab>
+</Tabs>
 
 ### Create a `NearbySettingsHost`
 
