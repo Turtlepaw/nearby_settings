@@ -46,7 +46,7 @@ val defaultSchema = SettingsSchema(
         SettingSchema(
             key = "text_input",
             label = "Text Input",
-            description = "**Markdown** *is* supported!",
+            description = "**Markdown** is fully supported thanks to [flutter_markdown](https://pub.dev/packages/flutter_markdown)!",
             type = SettingType.TEXT,
         ),
         SettingSchema(
@@ -56,6 +56,7 @@ val defaultSchema = SettingsSchema(
         ),
         SettingSchema(
             key = "toggle_input",
+            description = "This is a toggle input",
             label = "Toggle Input",
             type = SettingType.TOGGLE,
         ),

@@ -54,6 +54,7 @@ dependencies:
   go_router: ^14.7.1
   icons_launcher: ^2.1.7
   flutter_markdown: ^0.7.5
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

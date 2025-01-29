@@ -92,7 +92,7 @@ class NearbySettingsHost(
 
     init {
         // Optionally load previously saved settings
-        settingsManager.loadSettings(enablePersistence)?.let { savedSettings ->
+        settingsManager.loadSettings(settingsSchema, enablePersistence)?.let { savedSettings ->
             settingsSchema = savedSettings
             onSettingsChanged(savedSettings)
         }

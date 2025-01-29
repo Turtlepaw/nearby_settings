@@ -40,6 +40,9 @@ data class SettingSchema(
      * Description of the setting. Markdown is supported.
      */
     val description: String? = null,
+    /**
+     * If the setting is required.
+     */
     val required: Boolean = false
 )
 
@@ -62,6 +65,12 @@ data class SettingsSchema(
     }
 }
 
+@Serializable
+data class VersionedSettingsSchema(
+    val schemaItems: List<SettingSchema>,
+    val version: Int = 1
+)
+
 class SettingsManager(private val context: Context) {
     private val json = Json {
         ignoreUnknownKeys = true
@@ -69,54 +78,81 @@ class SettingsManager(private val context: Context) {
     }
 
     /**
-     * Saves settings only if persistence is enabled
+     * Saves settings with version tracking
      */
     fun saveSettings(settingsSchema: SettingsSchema, enablePersistence: Boolean = false) {
         if (enablePersistence) {
-            val serializedSettings = json.encodeToString(settingsSchema)
+            val versionedSchema = VersionedSettingsSchema(settingsSchema.schemaItems)
+            val serializedSettings = json.encodeToString(versionedSchema)
             File(context.filesDir, "settings_schema.json").writeText(serializedSettings)
         }
     }
 
     /**
-     * Loads previously saved settings if persistence was used
-     * @param enablePersistence Whether to attempt loading persisted settings
+     * Loads settings and preserves values when schema changes
      */
-    fun loadSettings(enablePersistence: Boolean = false): SettingsSchema? {
+    fun loadSettings(
+        currentSchema: SettingsSchema,
+        enablePersistence: Boolean = false
+    ): SettingsSchema? {
         if (!enablePersistence) return null
 
         val file = File(context.filesDir, "settings_schema.json")
-        return if (file.exists()) {
-            try {
-                val serializedSettings = file.readText()
-                json.decodeFromString<SettingsSchema>(serializedSettings)
-            } catch (e: Exception) {
-                null
-            }
-        } else null
+        if (!file.exists()) return null
+
+        return try {
+            val serializedSettings = file.readText()
+            val savedSchema = json.decodeFromString<VersionedSettingsSchema>(serializedSettings)
+
+            // Create map of saved values
+            val savedValues = savedSchema.schemaItems.associate { it.key to it.value }
+
+            // Apply saved values to current schema where types match
+            SettingsSchema(
+                schemaItems = currentSchema.schemaItems.map { setting ->
+                    val savedValue = savedValues[setting.key]
+                    if (savedValue != null && validateSettingValue(setting, savedValue)) {
+                        setting.copy(value = savedValue)
+                    } else {
+                        setting
+                    }
+                }
+            )
+        } catch (e: Exception) {
+            null
+        }
     }
 
     /**
      * Validates a setting value against its constraints
      */
     fun validateSettingValue(setting: SettingSchema, value: String): Boolean {
-        return when (setting.type) {
-            SettingType.NUMBER -> {
-                val numValue = value.toIntOrNull()
-                numValue != null &&
-                        (setting.constraints?.min == null || numValue >= setting.constraints.min) &&
-                        (setting.constraints?.max == null || numValue <= setting.constraints.max)
-            }
-            SettingType.SELECT -> {
-                setting.constraints?.options?.contains(value) ?: true
-            }
-            SettingType.MULTI_SELECT -> {
-                val selectedOptions = value.split(",")
-                selectedOptions.all { option ->
-                    setting.constraints?.options?.contains(option) ?: true
+        if (value == setting.defaultValue) return true
+
+        return try {
+            when (setting.type) {
+                SettingType.NUMBER -> {
+                    val numValue = value.toIntOrNull()
+                    numValue != null &&
+                            (setting.constraints?.min == null || numValue >= setting.constraints.min) &&
+                            (setting.constraints?.max == null || numValue <= setting.constraints.max)
                 }
+                SettingType.SELECT -> {
+                    setting.constraints?.options?.contains(value) ?: true
+                }
+                SettingType.MULTI_SELECT -> {
+                    val selectedOptions = value.split(",").map { it.trim() }
+                    selectedOptions.all { option ->
+                        setting.constraints?.options?.contains(option) ?: true
+                    }
+                }
+                SettingType.TOGGLE -> {
+                    value == "true" || value == "false"
+                }
+                SettingType.TEXT -> true
             }
-            else -> true
+        } catch (e: Exception) {
+            false
         }
     }
 }

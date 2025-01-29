@@ -3,6 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:nearby_settings/schema.dart';
 import 'package:nearby_settings/settings_client.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -28,12 +29,9 @@ class _SettingsPageState extends State<SettingsPage> {
     // Create a new schema with updated values
     final updatedSchema = SettingsSchema(
         schemaItems: provider.schema!.schemaItems.map((setting) {
-          // You can add any additional transformations or validations here
-          return setting.copyWith(
-              value: setting.value ?? setting.defaultValue
-          );
-        }).toList()
-    );
+      // You can add any additional transformations or validations here
+      return setting.copyWith(value: setting.value ?? setting.defaultValue);
+    }).toList());
 
     // Send the entire updated schema
     await provider.sendSettings(updatedSchema);
@@ -51,9 +49,8 @@ class _SettingsPageState extends State<SettingsPage> {
         return TextFormField(
           initialValue: setting.value ?? setting.defaultValue,
           decoration: InputDecoration(
-            labelText: setting.label,
-            helperText: setting.description,
-          ),
+              //labelText: setting.label,
+              ),
           onChanged: (value) => _updateSettingValue(setting.key, value),
         );
       case SettingType.number:
@@ -61,16 +58,16 @@ class _SettingsPageState extends State<SettingsPage> {
           initialValue: setting.value ?? setting.defaultValue,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            labelText: setting.label,
-            helperText: setting.description,
-          ),
+              //labelText: setting.label,
+              ),
           onChanged: (value) => _updateSettingValue(setting.key, value),
         );
       case SettingType.toggle:
         return SwitchListTile(
+          splashRadius: 500,
           title: Text(setting.label),
           subtitle: setting.description != null
-              ? Text(setting.description!)
+              ? buildDescription(setting.description!)
               : null,
           value: (setting.value ?? setting.defaultValue ?? 'false') == 'true',
           onChanged: (bool value) {
@@ -81,7 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return DropdownButtonFormField<String>(
           decoration: InputDecoration(
             labelText: setting.label,
-            helperText: setting.description,
+            //helperText: setting.description,
           ),
           value: setting.value ?? setting.defaultValue,
           items: setting.constraints?.options?.map((String value) {
@@ -108,6 +105,31 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Widget buildDescription(String description) {
+    return MarkdownBody(
+      data: description,
+      styleSheet: MarkdownStyleSheet(
+        p: Theme.of(context).textTheme.bodySmall,
+      ),
+      onTapLink: (String text, String? href, String title) async {
+        if (href == null) return print("href is null");
+        final url = Uri.parse(href);
+
+        await launchUrl(url);
+        try {
+          await launchUrl(url);
+        } catch (e) {
+          // show snackbar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Could not launch: $e'),
+            ),
+          );
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<SettingsClient>(context);
@@ -125,45 +147,44 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: schema == null
           ? const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Loading settings...'),
-          ],
-        ),
-      )
-          : ListView(
-        padding: const EdgeInsets.all(16),
-        children: schema.schemaItems.map((setting) {
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    setting.label,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  if (setting.description != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        "desk",
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ),
-                  const SizedBox(height: 16),
-                  _buildSettingWidget(setting),
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Loading settings...'),
                 ],
               ),
+            )
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: schema.schemaItems.map((setting) {
+                final showLabel = setting.type != SettingType.toggle;
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (showLabel)
+                          Text(
+                            setting.label,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        if (setting.description != null && showLabel)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: buildDescription(setting.description!),
+                          ),
+                        if (showLabel) const SizedBox(height: 16),
+                        _buildSettingWidget(setting),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
-          );
-        }).toList(),
-      ),
     );
   }
 }
@@ -173,11 +194,8 @@ class MultiSelectChip extends StatefulWidget {
   final SettingSchema setting;
   final Function(List<String>) onSelectionChanged;
 
-  const MultiSelectChip({
-    super.key,
-    required this.setting,
-    required this.onSelectionChanged
-  });
+  const MultiSelectChip(
+      {super.key, required this.setting, required this.onSelectionChanged});
 
   @override
   _MultiSelectChipState createState() => _MultiSelectChipState();
