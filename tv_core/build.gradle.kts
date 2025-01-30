@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.github.turtlepaw"
-version = "1.0"
+version = "1.0.1"
 
 android {
     namespace = "com.turtlepaw.nearby_settings.tv_core"

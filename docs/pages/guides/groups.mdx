@@ -1,0 +1,39 @@
+# Groups
+
+Nearby Settings supports groups starting in 1.0.1. Groups allow you to organize settings together.
+
+## Create a group
+
+The preferred way to create a group is to create a variable containing the `GroupData` and specify the group variable when creating a setting.
+
+```kotlin
+// Define your group as a variable
+val customInputGroup = GroupData(
+    key = "custom_input_group",
+    label = "Custom Input Group",
+    description = "Custom input group with custom input"
+)
+
+val defaultSchema = SettingsSchema(
+    schemaItems = listOf(
+        //...
+        SettingSchema(
+            key = "toggle_parent",
+            label = "Custom Input",
+            type = SettingType.TOGGLE,
+            group = customInputGroup
+        ),
+        // Users can only enter text if `toggle_parent` is enabled
+        SettingSchema(
+            key = "custom_input",
+            label = "Custom Input",
+            type = SettingType.TEXT,
+            group = customInputGroup,
+            parent = SettingParent(
+                key = "toggle_parent",
+                requiredBoolValue = true
+            )
+        )
+    )
+);
+```
