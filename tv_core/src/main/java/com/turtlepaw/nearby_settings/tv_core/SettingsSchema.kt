@@ -23,18 +23,83 @@ enum class SettingType {
 
 @Serializable
 data class SettingConstraints(
+    /**
+     * Only applies to [SettingType.NUMBER], [SettingType.TEXT] and [SettingType.MULTI_SELECT].
+     *
+     * - [SettingType.NUMBER] will limit the value
+     * - [SettingType.TEXT] will limit the length of the string
+     * - [SettingType.MULTI_SELECT] will limit the number of selected options
+     */
     val min: Int? = null,
+    /**
+     * Only applies to [SettingType.NUMBER], [SettingType.TEXT] and [SettingType.MULTI_SELECT].
+     *
+     * - [SettingType.NUMBER] will limit the value
+     * - [SettingType.TEXT] will limit the length of the string
+     * - [SettingType.MULTI_SELECT] will limit the number of selected options
+     */
     val max: Int? = null,
+    /**
+     * Only applies to and required for [SettingType.SELECT] and [SettingType.MULTI_SELECT]. The options will be shown to the user.
+     */
     val options: List<String>? = null
 )
 
 @Serializable
-data class SettingSchema(
+data class SettingParent(
     val key: String,
+    /**
+     * Required parent value for this setting to be visible.
+     *
+     * The parent must be a [SettingType.TOGGLE] or it will be ignored.
+     */
+    val requiredBoolValue: Boolean? = null,
+    /**
+     * Required parent value for this setting to be visible.
+     *
+     * The parent must be a [SettingType.SELECT] or it will be ignored.
+     */
+    val requiredStringValue: String? = null,
+)
+
+@Serializable
+data class GroupData(
+    val key: String,
+    /**
+     * Label of the group shown to the user. If null, no label will be shown.
+     */
+    val label: String? = null,
+    /**
+     * Description of the group shown to the user. Markdown is supported.
+     */
+    val description: String? = null,
+)
+
+@Serializable
+data class SettingSchema(
+    /**
+     * Key of the setting used internally to identify it.
+     */
+    val key: String,
+    /**
+     * Label of the setting shown to the user.
+     */
     val label: String,
+    /**
+     * Type of the setting.
+     */
     val type: SettingType,
+    /**
+     * Default value of the setting stored as a string.
+     */
     val defaultValue: String? = null,
-    val value: String? = defaultValue, // New field to store current value
+    /**
+     * Current value of the setting stored as a string. May be overridden if [NearbySettingsHost.enablePersistence] is true.
+     */
+    val value: String? = defaultValue,
+    /**
+     * Constraints for the setting.
+     */
     val constraints: SettingConstraints? = null,
     /**
      * Description of the setting. Markdown is supported.
@@ -43,7 +108,17 @@ data class SettingSchema(
     /**
      * If the setting is required.
      */
-    val required: Boolean = false
+    val required: Boolean = false,
+    /**
+     * Parent that controls this setting's visibility.
+     *
+     * If specified, this setting is only shown when the parent setting is a specified value.
+     */
+    val parent: SettingParent? = null,
+    /**
+     * Group of the setting reflected in the UI.
+     */
+    val group: GroupData? = null
 )
 
 @Serializable
@@ -51,7 +126,34 @@ data class SettingsSchema(
     val schemaItems: List<SettingSchema>
 ) {
     /**
-     * Returns the value of the setting with the given key.
+     * Returns whether a setting should be visible based on its parent's state
+     */
+    fun isSettingVisible(key: String): Boolean {
+        val setting = schemaItems.find { it.key == key } ?: return false
+
+        // If no parent specified, always visible
+        if (setting.parent == null) return true
+
+        // Find parent setting
+        val parentSetting = schemaItems.find { it.key == setting.parent.key } ?: return false
+        val parentValue = parentSetting.value ?: parentSetting.defaultValue
+
+        return when (parentSetting.type) {
+            SettingType.TOGGLE -> parentValue.toBoolean() == setting.parent.requiredBoolValue
+            SettingType.SELECT -> parentValue == setting.parent.requiredStringValue
+            else -> true
+        }
+    }
+
+    /**
+     * Returns all visible settings based on current values
+     */
+    fun getVisibleSettings(): List<SettingSchema> {
+        return schemaItems.filter { isSettingVisible(it.key) }
+    }
+
+    /**
+     * Updates a setting value and returns a new schema
      */
     fun updateSetting(key: String, newValue: String): SettingsSchema {
         return copy(
@@ -65,8 +167,11 @@ data class SettingsSchema(
     }
 }
 
+/**
+ * Used internally to migrate from older versions of the schema defined.
+ */
 @Serializable
-data class VersionedSettingsSchema(
+private data class VersionedSettingsSchema(
     val schemaItems: List<SettingSchema>,
     val version: Int = 1
 )

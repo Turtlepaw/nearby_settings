@@ -21,6 +21,32 @@ Map<String, dynamic> _$SettingConstraintsToJson(SettingConstraints instance) =>
       'options': instance.options,
     };
 
+SettingParent _$SettingParentFromJson(Map<String, dynamic> json) =>
+    SettingParent(
+      key: json['key'] as String,
+      requiredBoolValue: json['requiredBoolValue'] as bool?,
+      requiredStringValue: json['requiredStringValue'] as String?,
+    );
+
+Map<String, dynamic> _$SettingParentToJson(SettingParent instance) =>
+    <String, dynamic>{
+      'key': instance.key,
+      'requiredBoolValue': instance.requiredBoolValue,
+      'requiredStringValue': instance.requiredStringValue,
+    };
+
+GroupData _$GroupDataFromJson(Map<String, dynamic> json) => GroupData(
+      key: json['key'] as String,
+      label: json['label'] as String?,
+      description: json['description'] as String?,
+    );
+
+Map<String, dynamic> _$GroupDataToJson(GroupData instance) => <String, dynamic>{
+      'key': instance.key,
+      'label': instance.label,
+      'description': instance.description,
+    };
+
 SettingSchema _$SettingSchemaFromJson(Map<String, dynamic> json) =>
     SettingSchema(
       key: json['key'] as String,
@@ -34,6 +60,12 @@ SettingSchema _$SettingSchemaFromJson(Map<String, dynamic> json) =>
               json['constraints'] as Map<String, dynamic>),
       description: json['description'] as String?,
       required: json['required'] as bool? ?? false,
+      parent: json['parent'] == null
+          ? null
+          : SettingParent.fromJson(json['parent'] as Map<String, dynamic>),
+      group: json['group'] == null
+          ? null
+          : GroupData.fromJson(json['group'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$SettingSchemaToJson(SettingSchema instance) =>
@@ -46,6 +78,8 @@ Map<String, dynamic> _$SettingSchemaToJson(SettingSchema instance) =>
       'constraints': instance.constraints,
       'description': instance.description,
       'required': instance.required,
+      'parent': instance.parent,
+      'group': instance.group,
     };
 
 const _$SettingTypeEnumMap = {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:nearby_settings/schema.dart';
 import 'package:nearby_settings/settings_client.dart';
@@ -43,15 +44,25 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSettingWidget(SettingSchema setting) {
+  Widget _buildSettingWidget(SettingSchema setting, {bool enabled = true}) {
     switch (setting.type) {
       case SettingType.text:
         return TextFormField(
           initialValue: setting.value ?? setting.defaultValue,
-          decoration: InputDecoration(
-              //labelText: setting.label,
-              ),
+          //maxLength: setting.constraints?.max,
+          //maxLengthEnforcement: MaxLengthEnforcement.enforced,
+          validator: (value) {
+            print("Validating: $value \n Result: ${value == null || value.length < (setting.constraints?.min ?? 0)}");
+            if (value == null || value.length < (setting.constraints?.min ?? 0)) {
+              return 'Minimum length is ${setting.constraints?.min} characters';
+            }
+            return null;
+          },
+          onSaved: (value){
+            print("Saved: $value");
+          },
           onChanged: (value) => _updateSettingValue(setting.key, value),
+          enabled: enabled,
         );
       case SettingType.number:
         return TextFormField(
@@ -61,18 +72,19 @@ class _SettingsPageState extends State<SettingsPage> {
               //labelText: setting.label,
               ),
           onChanged: (value) => _updateSettingValue(setting.key, value),
+          enabled: enabled,
         );
       case SettingType.toggle:
         return SwitchListTile(
-          splashRadius: 500,
+          shape: Theme.of(context).cardTheme.shape ?? const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
           title: Text(setting.label),
           subtitle: setting.description != null
               ? buildDescription(setting.description!)
               : null,
           value: (setting.value ?? setting.defaultValue ?? 'false') == 'true',
-          onChanged: (bool value) {
+          onChanged: enabled ? (bool value) {
             _updateSettingValue(setting.key, value.toString());
-          },
+          } : null,
         );
       case SettingType.select:
         return DropdownButtonFormField<String>(
@@ -87,11 +99,11 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Text(value),
             );
           }).toList(),
-          onChanged: (String? newValue) {
+          onChanged: enabled ? (String? newValue) {
             if (newValue != null) {
               _updateSettingValue(setting.key, newValue);
             }
-          },
+          } : null,
         );
       case SettingType.multiSelect:
         return MultiSelectChip(
@@ -108,9 +120,8 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget buildDescription(String description) {
     return MarkdownBody(
       data: description,
-      styleSheet: MarkdownStyleSheet(
-        p: Theme.of(context).textTheme.bodySmall,
-      ),
+      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)),
+      listItemCrossAxisAlignment: MarkdownListItemCrossAxisAlignment.start,
       onTapLink: (String text, String? href, String title) async {
         if (href == null) return print("href is null");
         final url = Uri.parse(href);
@@ -127,6 +138,109 @@ class _SettingsPageState extends State<SettingsPage> {
           );
         }
       },
+    );
+  }
+
+  Widget _buildSettingCard(SettingSchema setting) {
+    final showLabel = setting.type != SettingType.toggle;
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (showLabel)
+              Text(
+                setting.label,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            if (setting.description != null && showLabel)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: buildDescription(setting.description!),
+              ),
+            if (showLabel) const SizedBox(height: 16),
+            _buildSettingWidget(
+              setting,
+              enabled: Provider.of<SettingsClient>(context).schema!.isSettingVisible(setting.key),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroupCard(GroupData groupData, List<SettingSchema> groupSettings) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if(groupData.description != null || groupData.label != null) Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24).add(
+              const EdgeInsets.only(top: 16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if(groupData.label != null) Text(
+                  groupData.label!,
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .titleLarge,
+                ),
+                if(groupData.label != null) buildDescription(groupData.description!)
+              ],
+            ),
+          ),
+          //const Divider(height: 1),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            itemCount: groupSettings.length,
+            separatorBuilder: (context, index) => const SizedBox(), //const Divider(height: 32),
+            itemBuilder: (context, index) {
+              final setting = groupSettings[index];
+              return Card.outlined(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (setting.type != SettingType.toggle)
+                        Text(
+                          setting.label,
+                          style: Theme
+                              .of(context)
+                              .textTheme
+                              .titleMedium,
+                        ),
+                      if (setting.description != null &&
+                          setting.type != SettingType.toggle)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: buildDescription(setting.description!),
+                        ),
+                      if (setting.type != SettingType.toggle)
+                        const SizedBox(height: 16),
+                      _buildSettingWidget(
+                        setting,
+                        enabled: Provider
+                            .of<SettingsClient>(context)
+                            .schema!
+                            .isSettingVisible(setting.key),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -150,7 +264,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
+                  CircularProgressIndicator(year2023: false,),
                   SizedBox(height: 16),
                   Text('Loading settings...'),
                 ],
@@ -158,32 +272,33 @@ class _SettingsPageState extends State<SettingsPage> {
             )
           : ListView(
               padding: const EdgeInsets.all(16),
-              children: schema.schemaItems.map((setting) {
-                final showLabel = setting.type != SettingType.toggle;
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (showLabel)
-                          Text(
-                            setting.label,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        if (setting.description != null && showLabel)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: buildDescription(setting.description!),
-                          ),
-                        if (showLabel) const SizedBox(height: 16),
-                        _buildSettingWidget(setting),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
+              children: [
+                // First, display ungrouped settings
+                ...schema.schemaItems
+                    .where((setting) => setting.group == null)
+                    .map(_buildSettingCard),
+
+                // Then, display grouped settings
+                ...schema.schemaItems
+                    .where((setting) => setting.group != null)
+                    .fold<Map<String, List<SettingSchema>>>(
+                  {},
+                      (groups, setting) {
+                    final groupKey = setting.group!.key;
+                    groups.putIfAbsent(groupKey, () => []);
+                    groups[groupKey]!.add(setting);
+                    return groups;
+                  },
+                )
+                    .entries
+                    .map((entry) {
+                  // Find the GroupData object for this key
+                  final groupData = schema.schemaItems
+                      .firstWhere((setting) => setting.group?.key == entry.key)
+                      .group!;
+                  return _buildGroupCard(groupData, entry.value);
+                })
+              ],
             ),
     );
   }
@@ -193,9 +308,10 @@ class _SettingsPageState extends State<SettingsPage> {
 class MultiSelectChip extends StatefulWidget {
   final SettingSchema setting;
   final Function(List<String>) onSelectionChanged;
+  final bool enabled;
 
   const MultiSelectChip(
-      {super.key, required this.setting, required this.onSelectionChanged});
+      {super.key, required this.setting, required this.onSelectionChanged, this.enabled = true});
 
   @override
   _MultiSelectChipState createState() => _MultiSelectChipState();
@@ -225,7 +341,7 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
         return FilterChip(
           label: Text(option),
           selected: _selectedItems.contains(option),
-          onSelected: (bool selected) {
+          onSelected: widget.enabled ? (bool selected) {
             setState(() {
               if (selected) {
                 _selectedItems.add(option);
@@ -234,7 +350,7 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
               }
               widget.onSelectionChanged(_selectedItems);
             });
-          },
+          } : null,
         );
       }).toList(),
     );

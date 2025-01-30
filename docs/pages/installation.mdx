@@ -4,6 +4,12 @@ import { Steps, Tabs } from "nextra/components";
 
 Adding Nearby Settings to your app is easy. Just follow these steps to get started.
 
+## Before you get started
+
+Nearby Settings is still being developed, some things might not work yet.
+
+- `SettingSchema#constraints` is not yet implemented for `SettingType.MULTI_SELECT` and `SettingType.NUMBER` contrary to the documentation.
+
 <Steps>
 ### Add required permissions for Nearby Connections
 
@@ -79,7 +85,7 @@ Add the following dependency to your `build.gradle` file:
 	dependencies {
 	        implementation 'com.github.Turtlepaw:nearby_settings:1.0.0'
 	}
-```
+``` 
 </Tabs.Tab>
 </Tabs>
 

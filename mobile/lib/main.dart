@@ -120,7 +120,11 @@ class _HomePageState extends State<HomePage> {
     final settingsClient = Provider.of<SettingsClient>(context).useContext(context);
     final isDiscovering = settingsClient.isDiscovering;
     final theme = Theme.of(context);
-    return Scaffold(
+    final _formKey = GlobalKey<FormState>();
+    return
+      Form(
+        key: _formKey,
+        child: Scaffold(
         appBar: AppBar(
           title: const Text("Nearby Settings"),
           bottom: isDiscovering
@@ -154,7 +158,7 @@ class _HomePageState extends State<HomePage> {
               final key = entry.key;
               final device = entry.value;
               return Card(
-                margin: const EdgeInsets.symmetric(horizontal: 10),
+                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
                     onTap: () async {
@@ -205,6 +209,7 @@ class _HomePageState extends State<HomePage> {
                   ));
             })
           ],
-        )));
+        )))
+      );
   }
 }

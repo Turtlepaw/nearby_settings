@@ -249,6 +249,7 @@ class SettingsClient with ChangeNotifier {
       onDisconnected: (String endpointId) {
         print('Disconnected from $endpointId');
         _currentEndpointId = null;
+        discoveredDevices[endpointId]?.status = ConnectionStatus.disconnected;
         notifyListeners();
         // Pop if /settings
         if (_context?.canPop() ?? false) {
