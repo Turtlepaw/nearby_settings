@@ -1,3 +1,5 @@
+import { Tabs } from "nextra/components";
+
 # Groups
 
 Nearby Settings supports groups starting in 1.0.1. Groups allow you to organize settings together.
@@ -5,6 +7,9 @@ Nearby Settings supports groups starting in 1.0.1. Groups allow you to organize 
 ## Create a group
 
 The preferred way to create a group is to create a variable containing the `GroupData` and specify the group variable when creating a setting.
+
+<Tabs items={['Code', 'Preview']}>
+  <Tabs.Tab>
 
 ```kotlin
 // Define your group as a variable
@@ -37,3 +42,10 @@ val defaultSchema = SettingsSchema(
     )
 );
 ```
+
+</Tabs.Tab>
+<Tabs.Tab>
+  
+![Group Preview](/inputs/group.png)
+</Tabs.Tab>
+</Tabs>

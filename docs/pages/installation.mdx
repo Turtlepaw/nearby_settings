@@ -1,4 +1,4 @@
-import { Steps, Tabs, Callout } from "nextra/components";
+import { Steps, Tabs, Callout, Image } from "nextra/components";
 
 # Installation
 
@@ -178,3 +178,26 @@ val settingsHost = remember {
 </Callout>
 
 </Steps>
+
+## Defining app details
+
+Starting in 1.0.1, you can define app details to show to the user.
+
+```kotlin
+val settingsHost = NearbySettingsHost(
+    // ...
+    // Define app details shown to the user
+    appDetails = AppDetails(
+        label = "My Nearby Settings App",
+        developer = "Your Developer Name",
+        // Provide a way for users to contact you, this is currently optional but may be enforced in the future.
+        contact = "youremail@example.com",
+        // Provide a website for users to visit (optional).
+        website = "https://nearbysettings.pages.dev/"
+    )
+)
+```
+
+It will be rendered in a dialog containing the app details provided.
+
+<Image src="/app_details.png" alt="App Details" width={200} />
