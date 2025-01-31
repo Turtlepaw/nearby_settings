@@ -17,15 +17,59 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+@Serializable
+data class AppDetails(
+    /**
+     * Label of the app shown to the user.
+     */
+    val label: String,
+    /**
+     * Developer of the app shown to the user.
+     */
+    val developer: String,
+    /**
+     * Website of the app shown to the user.
+     */
+    val website: String? = null,
+    /**
+     * Method of contacting the app developer(s) shown to the user. You can provide a:
+     *
+     * - Email address
+     * - Social media handle (e.g. bluesky)
+     * - Any other methods that users can contact you via text
+     *
+     * This is not required, but is highly recommended and may be enforced in later versions.
+     */
+    val contact: String? = null,
+)
+
+
 class NearbySettingsHost(
+    /**
+     * Settings schema to be displayed to the user.
+     */
     private var settingsSchema: SettingsSchema,
+    /**
+     * Called when mobile app settings are synced.
+     */
     private val onSettingsChanged: (SettingsSchema) -> Unit,
     val context: Context,
+    /**
+     * If true, the app will persist settings across app launches.
+     */
     private val enablePersistence: Boolean = false,
-    automaticallyStart: Boolean = false
+    /**
+     * If true, the app will automatically start advertising when [NearbySettingsHost] is created.
+     */
+    automaticallyStart: Boolean = false,
+    /**
+     * App name shown to users to identify and distinguish your app.
+     */
+    private val appDetails: AppDetails
 ) {
     private val settingsManager = SettingsManager(context)
     private val appId = "com.turtlepaw.nearby_settings"
@@ -34,7 +78,7 @@ class NearbySettingsHost(
     private val connectionLifecycleCallback = object : ConnectionLifecycleCallback() {
         override fun onConnectionInitiated(endpointId: String, info: ConnectionInfo) {
             // Assuming rawAuthenticationToken is a ByteArray
-            val authEmoji = convertDigitsToEmoji(info.authenticationToken)
+            val authEmoji = convertDigitsToEmoji(info.authenticationDigits)
 
             Log.d(TAG, "onConnectionInitiated: $authEmoji")
 
@@ -49,6 +93,7 @@ class NearbySettingsHost(
             if (result.status.isSuccess) {
                 // Connection established, send schema
                 sendSchema(endpointId)
+                sendAppDetails(endpointId)
             }
         }
 
@@ -244,6 +289,15 @@ class NearbySettingsHost(
     private fun sendSchema(endpointId: String) {
         Log.d(TAG, "Sending schema to $endpointId, schema: $settingsSchema")
         val schemaBytes = Json.encodeToString(settingsSchema)
+            .toByteArray(Charsets.UTF_8)
+
+        nearby.sendPayload(endpointId, Payload.fromBytes(schemaBytes))
+    }
+
+    private fun sendAppDetails(endpointId: String) {
+        Log.d(TAG, "Sending app name to $endpointId, ")
+        if(appDetails.contact == null) Log.w(TAG, "NearbySettingsHost.appDetails#contact isn't set. This is highly recommended to set, as it may be enforced in later versions.")
+        val schemaBytes = Json.encodeToString(appDetails)
             .toByteArray(Charsets.UTF_8)
 
         nearby.sendPayload(endpointId, Payload.fromBytes(schemaBytes))

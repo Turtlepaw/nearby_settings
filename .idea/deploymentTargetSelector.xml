@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="Nearby_Settings.example">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-01-29T00:25:39.485670200Z">
+        <DropdownSelection timestamp="2025-01-31T03:08:00.191909500Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=5edbad46" />

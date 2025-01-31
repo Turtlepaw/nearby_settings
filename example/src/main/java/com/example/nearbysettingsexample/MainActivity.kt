@@ -33,6 +33,7 @@ import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import com.example.nearbysettingsexample.ui.theme.NearbySettingsExampleTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.turtlepaw.nearby_settings.tv_core.AppDetails
 import com.turtlepaw.nearby_settings.tv_core.GroupData
 import com.turtlepaw.nearby_settings.tv_core.NearbySettingsHost
 import com.turtlepaw.nearby_settings.tv_core.SettingConstraints
@@ -130,7 +131,13 @@ class MainActivity : ComponentActivity() {
                     },
                     context = this,
                     enablePersistence = true,
-                    automaticallyStart = false
+                    automaticallyStart = false,
+                    appDetails = AppDetails(
+                        label = "Nearby Settings Example",
+                        developer = "Beaverfy",
+                        contact = "https://discord.com/invite/4CUkgTEmnr",
+                        website = "https://nearbysettings.pages.dev/"
+                    )
                 )
             }
 

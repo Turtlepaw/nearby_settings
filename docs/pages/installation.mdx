@@ -1,4 +1,4 @@
-import { Steps, Tabs } from "nextra/components";
+import { Steps, Tabs, Callout } from "nextra/components";
 
 # Installation
 
@@ -150,12 +150,22 @@ val settingsHost = NearbySettingsHost(
     // `NearbySettings` will store and retrieve it
     enablePersistence = true,
     // If you want to start advertising on start
-    automaticallyStart = true
+    automaticallyStart = true,
+    appDetails = AppDetails(
+        // These are required and shown to the user
+        label = "My Nearby Settings App",
+        developer = "Your Developer Name",
+        // Provide a way for users to contact you
+        // This is currently optional but may be enforced in the future
+        contact = "dev@example.com",
+        // Provide a website for users to visit (optional)
+        website = "https://nearbysettings.pages.dev/"
+    )
 )
 ```
 
-<details>
-<summary>If you're using Jetpack Compose, remember to add a `remember` block to the `NearbySettingsHost`</summary>
+<Callout type="info">
+If you're using Jetpack Compose, remember to add a `remember` block to the `NearbySettingsHost`:
 
 ```kotlin
 val settingsHost = remember {
@@ -165,6 +175,6 @@ val settingsHost = remember {
 }
 ```
 
-</details>
+</Callout>
 
 </Steps>

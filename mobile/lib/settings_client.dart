@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:location/location.dart';
 import 'package:nearby_connections/nearby_connections.dart';
+import 'package:nearby_settings/appDetails.dart';
 import 'package:nearby_settings/schema.dart';
 import 'package:pair/pair.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -41,12 +42,14 @@ class SettingsClient with ChangeNotifier {
 
   bool _isConnecting = false;
   bool _isDiscovering = false;
-  SettingsSchema? _schema = null;
+  SettingsSchema? _schema;
+  AppDetails? _appDetails;
 
   bool get isConnecting => _isConnecting;
   bool get isDiscovering => _isDiscovering;
   String? get connectedId => _currentEndpointId;
   SettingsSchema? get schema => _schema;
+  AppDetails? get appDetails => _appDetails;
 
   SettingsClient({BuildContext? context})
       : _context = context;
@@ -176,18 +179,28 @@ class SettingsClient with ChangeNotifier {
     _currentEndpointId = id;
 
     // Generate and show emoji
-    _currentEmoji = _convertDigitsToEmoji(info.authenticationToken);
+    _currentEmoji = _convertDigitsToEmoji(info.authenticationDigits);
     showEmojiScreen(_currentEmoji!);
 
     // Accept
     Nearby().acceptConnection(id, onPayLoadRecieved: (endpointId, payload) {
-      if(payload.type == PayloadType.BYTES && payload.bytes != null && payload.bytes!.length > 0){
-        // Convert bytes to a string
+      if(payload.type == PayloadType.BYTES && payload.bytes != null && payload.bytes!.isNotEmpty){
         String decodedString = utf8.decode(payload.bytes!);
+        var json = jsonDecode(decodedString);
 
-        var settings = SettingsSchema.fromJson(jsonDecode(decodedString));
-        _schema = settings;
-        notifyListeners();
+        try {
+          var settings = SettingsSchema.fromJson(json);
+          _schema = settings;
+          notifyListeners();
+        } catch (e) {
+          try {
+            var appDetails = AppDetails.fromJson(json);
+            _appDetails = appDetails;
+            notifyListeners();
+          } catch (e) {
+            print('Failed to parse payload as either SettingsSchema or AppDetails');
+          }
+        }
       }
     });
   }
