@@ -11,7 +11,7 @@
     </style>
 
     <!-- Normal theme applied after the app starts -->
-    <style name="NormalTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="NormalTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>

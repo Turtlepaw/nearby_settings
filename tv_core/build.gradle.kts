@@ -71,6 +71,10 @@ dependencies {
 
     // Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
+
+    // QR Codes (used for DiscoveryDialog)
+    implementation("com.github.alexzhirkevich:custom-qr-generator:2.0.0-alpha01")
+    implementation("com.google.accompanist:accompanist-drawablepainter:0.37.0")
 }
 
 afterEvaluate {

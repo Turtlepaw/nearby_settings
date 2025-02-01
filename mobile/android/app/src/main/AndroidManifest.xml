@@ -16,6 +16,8 @@
     <uses-permission android:minSdkVersion="32"
         android:name="android.permission.NEARBY_WIFI_DEVICES" />
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:label="Nearby Settings"
         android:name="${applicationName}"

@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.tv.material3.Text
 import androidx.compose.runtime.*
@@ -131,7 +133,7 @@ class MainActivity : ComponentActivity() {
                     },
                     context = this,
                     enablePersistence = true,
-                    automaticallyStart = false,
+                    automaticallyStart = true,
                     appDetails = AppDetails(
                         label = "Nearby Settings Example",
                         developer = "Beaverfy",
@@ -159,7 +161,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp)
-                        .padding(top = 15.dp),
+                        .padding(top = 15.dp)
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     settingsHost.AuthScreen()

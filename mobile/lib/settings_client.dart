@@ -71,23 +71,25 @@ class SettingsClient with ChangeNotifier {
     }
 
     // Bluetooth permissions
-    bool granted = !(await Future.wait([
-      // Check Permissions
+    bool granted = (await Future.wait([
       Permission.bluetooth.isGranted,
       Permission.bluetoothAdvertise.isGranted,
       Permission.bluetoothConnect.isGranted,
       Permission.bluetoothScan.isGranted,
-    ]))
-        .any((element) => false);
+    ])).every((element) => element);
 
     if (!granted) {
-      [
+      final requiredPermissions = [
         // Ask Permissions
         Permission.bluetooth,
         Permission.bluetoothAdvertise,
         Permission.bluetoothConnect,
         Permission.bluetoothScan
-      ].request();
+      ];
+
+      for(final permission in requiredPermissions){
+        final result = await permission.request();
+      }
     }
 
 // Check Bluetooth Status
