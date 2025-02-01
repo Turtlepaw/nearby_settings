@@ -13,17 +13,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import androidx.tv.material3.darkColorScheme
 import com.github.alexzhirkevich.customqrgenerator.QrData
 import com.github.alexzhirkevich.customqrgenerator.vector.QrCodeDrawable
 import com.github.alexzhirkevich.customqrgenerator.vector.QrVectorOptions
@@ -40,7 +46,15 @@ import com.github.alexzhirkevich.customqrgenerator.vector.style.QrVectorShapes
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
 @Composable
-fun NearbySettingsDiscovery() {
+fun NearbySettingsDiscovery(
+    qrCodeSize: Dp? = null,
+    dynamicQrCodeSizeFraction: Float = 0.09f,
+    onBackground: Color = MaterialTheme.colorScheme.onBackground,
+    largeTextStyle: TextStyle = MaterialTheme.typography.titleLarge,
+    smallTextStyle: TextStyle = MaterialTheme.typography.bodySmall
+) {
+    var rowSize by remember { mutableStateOf(IntSize.Zero) }
+
     val data = QrData.Url("https://nearbysettings.pages.dev/users")
     val options = QrVectorOptions.Builder()
         .setPadding(0f)
@@ -56,21 +70,21 @@ fun NearbySettingsDiscovery() {
         )
         .setBackground(
             QrVectorBackground(
-                color = QrVectorColor.Solid(
-                    Color.White.toArgb()
-                )
+                color = QrVectorColor.Transparent,
             )
         )
         .setColors(
             QrVectorColors(
                 dark = QrVectorColor
-                    .Solid(Color.Black.toArgb()),
+                    .Solid(
+                        onBackground.toArgb()
+                    ),
                 ball = QrVectorColor.Solid(
-                    Color.Black.toArgb()
+                    onBackground.toArgb()
                 ),
                 frame = QrVectorColor.Solid(
-                    Color(0xFF15321C).toArgb()
-                )
+                    onBackground.toArgb()
+                ),
             )
         )
         .setShapes(
@@ -88,14 +102,19 @@ fun NearbySettingsDiscovery() {
     val drawable = QrCodeDrawable(data, options)
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .onSizeChanged { rowSize = it },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val dynamicQrCodeSize = (rowSize.width * dynamicQrCodeSizeFraction).dp
+
         Image(
             painter = rememberDrawablePainter(drawable = drawable),
             contentDescription = "QR Code",
-            modifier = Modifier.size(80.dp)
+            modifier = Modifier.size(qrCodeSize ?: dynamicQrCodeSize)
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -107,13 +126,14 @@ fun NearbySettingsDiscovery() {
         ) {
             Text(
                 "nearbysettings.pages.dev",
-                style = MaterialTheme.typography.titleLarge
+                style = largeTextStyle,
+                color = onBackground
             )
             Spacer(modifier = Modifier.height(5.dp))
             Text(
                 "Open this link on your mobile device to download Nearby Settings",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onBackground.copy(0.9f)
+                style = smallTextStyle,
+                color = onBackground.copy(0.9f)
             )
         }
     }
@@ -121,7 +141,7 @@ fun NearbySettingsDiscovery() {
 
 @Preview
 @Composable
-private fun DiscoveryDialogPreview(){
+private fun DiscoveryDialogPreview() {
     Box(
         modifier = Modifier
             .background(
@@ -131,5 +151,24 @@ private fun DiscoveryDialogPreview(){
             .clip(shape = MaterialTheme.shapes.medium)
     ) {
         NearbySettingsDiscovery()
+    }
+}
+
+@Preview
+@Composable
+private fun DiscoveryDialogDarkPreview() {
+    MaterialTheme(
+        colorScheme = darkColorScheme()
+    ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    Color.Black,
+                    shape = MaterialTheme.shapes.medium
+                )
+                .clip(shape = MaterialTheme.shapes.medium)
+        ) {
+            NearbySettingsDiscovery()
+        }
     }
 }
