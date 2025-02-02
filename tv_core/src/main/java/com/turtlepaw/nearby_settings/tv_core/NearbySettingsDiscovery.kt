@@ -1,5 +1,7 @@
 package com.turtlepaw.nearby_settings.tv_core
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,11 +9,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,10 +27,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Devices.TV_1080p
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
@@ -61,7 +70,7 @@ fun NearbySettingsDiscovery(
      *
      * This is only used if [qrCodeSize] is `null`.
      */
-    dynamicQrCodeSizeFraction: Float = 0.09f,
+    dynamicQrCodeSizeFraction: Float = 0.08f,
     /**
      * Color to use on text and other elements. This color should be well-visible on the background.
      */
@@ -69,12 +78,12 @@ fun NearbySettingsDiscovery(
     /**
      * Text to use for the large text (the download link)
      */
-    largeTextStyle: TextStyle = MaterialTheme.typography.titleLarge,
+    largeTextStyle: TextStyle = MaterialTheme.typography.displaySmall,
     /**
      * Text to use for the small text (the description)
      */
-    smallTextStyle: TextStyle = MaterialTheme.typography.bodySmall
-) {
+    smallTextStyle: TextStyle = MaterialTheme.typography.bodyLarge
+){
     var rowSize by remember { mutableStateOf(IntSize.Zero) }
 
     val data = QrData.Url("https://nearbysettings.pages.dev/users")
@@ -126,9 +135,9 @@ fun NearbySettingsDiscovery(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(32.dp) // Increased padding for better TV viewing
             .onSizeChanged { rowSize = it },
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.Start, // Changed to Start to allow text to expand
         verticalAlignment = Alignment.CenterVertically
     ) {
         val dynamicQrCodeSize = (rowSize.width * dynamicQrCodeSizeFraction).dp
@@ -139,19 +148,21 @@ fun NearbySettingsDiscovery(
             modifier = Modifier.size(qrCodeSize ?: dynamicQrCodeSize)
         )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(32.dp)) // Increased spacing between QR and text
 
         Column(
             modifier = Modifier
-                .fillMaxWidth(),
+                .weight(1f), // Added weight to allow text to take remaining space
             verticalArrangement = Arrangement.Center
         ) {
             Text(
                 "nearbysettings.pages.dev",
                 style = largeTextStyle,
-                color = onBackground
+                color = onBackground,
+                maxLines = 1, // Ensure single line
+                modifier = Modifier.fillMaxWidth() // Allow text to take full width
             )
-            Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(12.dp)) // Increased spacing between texts
             Text(
                 "Open this link on your mobile device to download Nearby Settings",
                 style = smallTextStyle,
@@ -161,36 +172,58 @@ fun NearbySettingsDiscovery(
     }
 }
 
-@Preview
+/**
+ * Dialog that displays the [NearbySettingsDiscovery] component.
+ */
 @Composable
-private fun DiscoveryDialogPreview() {
-    Box(
-        modifier = Modifier
-            .background(
-                MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium
-            )
-            .clip(shape = MaterialTheme.shapes.medium)
-    ) {
-        NearbySettingsDiscovery()
+fun NearbySettingsDiscoveryDialog(
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit
+) {
+    BackHandler {
+        onDismiss()
     }
-}
 
-@Preview
-@Composable
-private fun DiscoveryDialogDarkPreview() {
-    MaterialTheme(
-        colorScheme = darkColorScheme()
+    Box(
+        modifier = modifier.fillMaxSize().zIndex(100f).background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.8f)),
+        contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
+                .fillMaxWidth(0.7f)
                 .background(
-                    Color.Black,
+                    MaterialTheme.colorScheme.background,
                     shape = MaterialTheme.shapes.medium
                 )
                 .clip(shape = MaterialTheme.shapes.medium)
         ) {
             NearbySettingsDiscovery()
         }
+    }
+}
+@Preview(
+    device = TV_1080p,
+    showBackground = true,
+    widthDp = 1920, // Standard 1080p TV width
+    heightDp = 1080  // Standard 1080p TV height
+)
+@Composable
+private fun DiscoveryDialogPreview() {
+    NearbySettingsDiscoveryDialog {}
+}
+
+@Preview(
+    device = TV_1080p,
+    uiMode = UI_MODE_NIGHT_YES,
+    showBackground = true,
+    widthDp = 1920, // Standard 1080p TV width
+    heightDp = 1080  // Standard 1080p TV height
+)
+@Composable
+private fun DiscoveryDialogDarkPreview() {
+    MaterialTheme(
+        colorScheme = darkColorScheme()
+    ) {
+        NearbySettingsDiscoveryDialog {}
     }
 }

@@ -43,6 +43,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.turtlepaw.nearby_settings.tv_core.AppDetails
 import com.turtlepaw.nearby_settings.tv_core.GroupData
 import com.turtlepaw.nearby_settings.tv_core.NearbySettingsDiscovery
+import com.turtlepaw.nearby_settings.tv_core.NearbySettingsDiscoveryDialog
 import com.turtlepaw.nearby_settings.tv_core.NearbySettingsHost
 import com.turtlepaw.nearby_settings.tv_core.SettingConstraints
 import com.turtlepaw.nearby_settings.tv_core.SettingParent
@@ -165,17 +166,8 @@ class MainActivity : ComponentActivity() {
 
             NearbySettingsExampleTheme {
                 if (showDiscoveryDialog) {
-                    Dialog(onDismissRequest = { showDiscoveryDialog = false }) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    MaterialTheme.colorScheme.background,
-                                    RoundedCornerShape(16.dp)
-                                ),
-                        ) {
-                            NearbySettingsDiscovery()
-                        }
+                    NearbySettingsDiscoveryDialog {
+                        showDiscoveryDialog = false
                     }
                 }
 
