@@ -4,8 +4,16 @@ Users may not know that your app supports Nearby Settings. To help users discove
 
 ## Add a discovery card
 
+This will render the QR code and download link. If you'd like to have it in a dialog, use `NearbySettingsDiscoveryDialog`.
+
 ```kotlin
+// Discovery card (QR code and download link)
 NearbySettingsDiscovery()
+
+// Dialog version
+NearbySettingsDiscoveryDialog {
+    // dismiss the dialog
+}
 ```
 
 That's all you need to do to make this UI appear in your app.
