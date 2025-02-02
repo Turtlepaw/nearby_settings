@@ -45,12 +45,34 @@ import com.github.alexzhirkevich.customqrgenerator.vector.style.QrVectorPixelSha
 import com.github.alexzhirkevich.customqrgenerator.vector.style.QrVectorShapes
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
+/**
+ * Use this UI component to help users discover your app supports Nearby Settings.
+ *
+ * This will provide the users a link and QR code to download the app on their mobile device.
+ */
 @Composable
 fun NearbySettingsDiscovery(
+    /**
+     * Static size for the QR code.
+     */
     qrCodeSize: Dp? = null,
+    /**
+     * The fraction of the row size to use for the QR code.
+     *
+     * This is only used if [qrCodeSize] is `null`.
+     */
     dynamicQrCodeSizeFraction: Float = 0.09f,
+    /**
+     * Color to use on text and other elements. This color should be well-visible on the background.
+     */
     onBackground: Color = MaterialTheme.colorScheme.onBackground,
+    /**
+     * Text to use for the large text (the download link)
+     */
     largeTextStyle: TextStyle = MaterialTheme.typography.titleLarge,
+    /**
+     * Text to use for the small text (the description)
+     */
     smallTextStyle: TextStyle = MaterialTheme.typography.bodySmall
 ) {
     var rowSize by remember { mutableStateOf(IntSize.Zero) }
