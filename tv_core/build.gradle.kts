@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.github.turtlepaw"
-version = "1.0.1-alpha1"
+version = "1.0.1-alpha2"
 
 android {
     namespace = "com.turtlepaw.nearby_settings.tv_core"
@@ -49,7 +49,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(platform(libs.androidx.compose.bom))
@@ -75,6 +74,9 @@ dependencies {
     // QR Codes (used for DiscoveryDialog)
     implementation("com.github.alexzhirkevich:custom-qr-generator:2.0.0-alpha01")
     implementation("com.google.accompanist:accompanist-drawablepainter:0.37.0")
+
+    // M3 Mobile
+    implementation("androidx.compose.material3:material3")
 }
 
 afterEvaluate {

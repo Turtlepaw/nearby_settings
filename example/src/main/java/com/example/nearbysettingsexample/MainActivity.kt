@@ -50,7 +50,7 @@ import com.turtlepaw.nearby_settings.tv_core.SettingParent
 import com.turtlepaw.nearby_settings.tv_core.SettingSchema
 import com.turtlepaw.nearby_settings.tv_core.SettingType
 import com.turtlepaw.nearby_settings.tv_core.SettingsSchema
-import com.turtlepaw.nearby_settings.tv_core.rememberRequiredPermissions
+import com.turtlepaw.nearby_settings.tv_core.rememberNearbyPermissions
 import kotlinx.coroutines.launch
 
 val customInputGroup = GroupData(
@@ -171,7 +171,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val permissions = rememberRequiredPermissions {}
+                val permissions = rememberNearbyPermissions()
                 Column(
                     modifier = Modifier
                         .fillMaxSize()

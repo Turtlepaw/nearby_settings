@@ -11,6 +11,7 @@ import 'package:nearby_settings/schema.dart';
 import 'package:pair/pair.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:open_settings_plus/open_settings_plus.dart';
 
 class DeviceConnection {
   final String id;
@@ -88,13 +89,19 @@ class SettingsClient with ChangeNotifier {
       ];
 
       for(final permission in requiredPermissions){
-        final result = await permission.request();
+        await permission.request();
       }
     }
 
-// Check Bluetooth Status
+    // Check Bluetooth Status
     if (!await Permission.bluetooth.serviceStatus.isEnabled) {
-      // TODO: open bluetooth settings
+      if (OpenSettingsPlus.shared is OpenSettingsPlusAndroid) {
+        (OpenSettingsPlus.shared as OpenSettingsPlusAndroid).bluetooth();
+      } else if (OpenSettingsPlus.shared is OpenSettingsPlusIOS) {
+        (OpenSettingsPlus.shared as OpenSettingsPlusIOS).bluetooth();
+      } else {
+        throw UnsupportedError("Unsupported platform");
+      }
     }
 
     if (!await Permission.nearbyWifiDevices.isGranted) {

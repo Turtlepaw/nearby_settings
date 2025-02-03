@@ -177,6 +177,17 @@ val settingsHost = remember {
 
 </Callout>
 
+##### Show the auth dialog
+
+This is required to show the authentication dialog to the user, verifying that the is connecting to the correct device. Add this Jetpack Compose code to show the dialog:
+
+```kotlin
+setContent {
+    settingsHost.AuthScreen()
+    //...
+}
+```
+
 </Steps>
 
 ## Defining app details

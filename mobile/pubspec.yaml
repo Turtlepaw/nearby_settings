@@ -55,6 +55,7 @@ dependencies:
   icons_launcher: ^2.1.7
   flutter_markdown: ^0.7.5
   url_launcher: ^6.3.1
+  open_settings_plus: ^0.4.0
 
 dev_dependencies:
   flutter_test:
