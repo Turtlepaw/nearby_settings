@@ -18,9 +18,9 @@ val permissions = rememberNearbyPermissions(
     // If true (default), a permission dialog will be shown before launching the permissions request
     dialog = true,
     // If true (default), the permissions will be requested when rememberNearbyPermissions is called
-    launchPermissionsOnStart: Boolean = true,
+    launchPermissionsOnStart = true,
     // Callback for when the permissions are changed
-    onPermissionsResult: (Map<String, Boolean>) -> Unit = {}
+    onPermissionsResult = {}
 )
 
 // Request all required permissions
