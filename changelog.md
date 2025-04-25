@@ -1,0 +1,2 @@
+- Create workflow to build and publish releases
+- Disable dependency metadata in Android builds
