@@ -11,7 +11,7 @@ version = "1.0.1-alpha2"
 
 android {
     namespace = "com.turtlepaw.nearby_settings.tv_core"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
