@@ -62,3 +62,4 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 tv_core/.gradle/config.properties
+/.gradle
