@@ -45,7 +45,7 @@ jobs:
 
       - name: Create keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > key.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > mobile/android/key.jks
 
       - name: Create key.properties
         run: |
@@ -53,7 +53,7 @@ jobs:
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword=${{ secrets.KEY_PASSWORD }}
           keyAlias=${{ secrets.KEY_ALIAS }}
-          storeFile=../key.jks
+          storeFile=key.jks
           EOF
           mv key.properties mobile/android/
 
