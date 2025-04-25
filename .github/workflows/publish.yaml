@@ -4,13 +4,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-release:
+  version:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Calculate version
         id: version
         run: |
@@ -22,32 +23,24 @@ jobs:
           echo "Calculated new version: $newVersion"
           echo "version=$newVersion" >> $GITHUB_OUTPUT
 
+  build-mobile:
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: "17"
           distribution: "temurin"
-
-      - name: Setup Gradle Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.x"
           channel: "stable"
-
       - name: Create keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mobile/android/app/key.jks
-
       - name: Create key.properties
         run: |
           cat << EOF > key.properties
@@ -57,20 +50,65 @@ jobs:
           storeFile=key.jks
           EOF
           mv key.properties mobile/android/
-
-      - name: Build mobile release APK
+      - name: Build APK
         run: |
           cd mobile
           flutter pub get
           flutter build apk --release
-          mv build/app/outputs/flutter-apk/app-release.apk ../mobile.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-apk
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Build example release APK
+  build-example:
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+      - name: Setup Gradle Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Build APK
         run: |
           chmod +x ./gradlew
           ./gradlew :example:assembleRelease
-          mv example/app/build/outputs/apk/release/app-release.apk example.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: example-apk
+          path: example/release/example-release.apk
 
+  release:
+    needs: [version, build-mobile, build-example]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download mobile APK
+        uses: actions/download-artifact@v4
+        with:
+          name: mobile-apk
+          path: .
+      - name: Download example APK
+        uses: actions/download-artifact@v4
+        with:
+          name: example-apk
+          path: .
+      - name: Rename APKs
+        run: |
+          mv app-release.apk mobile.apk
+          mv app-release.apk example.apk
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -81,5 +119,5 @@ jobs:
           draft: false
           prerelease: false
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: Release ${{ steps.version.outputs.version }}
-          tag_name: v${{ steps.version.outputs.version }}
+          name: Release ${{ needs.version.outputs.version }}
+          tag_name: v${{ needs.version.outputs.version }}
