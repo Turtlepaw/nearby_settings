@@ -19,6 +19,7 @@ jobs:
           IFS='.' read -r major minor patch <<< "$ver"
           newPatch=$((patch + 1))
           newVersion="$major.$minor.$newPatch"
+          echo "Calculated new version: $newVersion"
           echo "version=$newVersion" >> $GITHUB_OUTPUT
 
       - name: Set up JDK
@@ -45,7 +46,7 @@ jobs:
 
       - name: Create keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > mobile/android/app/key.jks
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mobile/android/app/key.jks
 
       - name: Create key.properties
         run: |
@@ -66,9 +67,9 @@ jobs:
 
       - name: Build example release APK
         run: |
-          cd example
-          ./gradlew assembleRelease
-          mv app/build/outputs/apk/release/app-release.apk ../example.apk
+          chmod +x ./gradlew
+          ./gradlew :example:assembleRelease
+          mv example/app/build/outputs/apk/release/app-release.apk example.apk
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
