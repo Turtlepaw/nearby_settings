@@ -63,3 +63,10 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-permissions:0.37.0")
 }
+
+android.applicationVariants.all {
+    outputs.all {
+        println(">>> APK for ${this@all.name} variant: ${outputFile}")
+    }
+}
+
