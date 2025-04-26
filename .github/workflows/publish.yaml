@@ -99,16 +99,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mobile-apk
-          path: .
+          path: mobile-artifact
       - name: Download example APK
         uses: actions/download-artifact@v4
         with:
           name: example-apk
-          path: .
+          path: example-artifact
       - name: Rename APKs
         run: |
-          mv app-release.apk mobile.apk
-          mv example-release-unsigned.apk example.apk
+          mv mobile-artifact/app-release.apk mobile.apk
+          mv example-artifact/example-release-unsigned.apk example.apk
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
