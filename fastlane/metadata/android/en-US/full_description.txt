@@ -1,0 +1,3 @@
+Nearby settings helps developers quickly build apps for Android TV (and other Android devices) that are configurable with mobile devices. It uses the Nearby Connections API from Google Play Services to communicate with nearby devices and modify settings.
+
+Learn more: https://nearbysettings.pages.dev/
