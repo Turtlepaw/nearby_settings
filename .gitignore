@@ -65,3 +65,5 @@ tv_core/.gradle/config.properties
 /.gradle
 
 example/release
+
+docs/node_modules
