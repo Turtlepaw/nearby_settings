@@ -15,9 +15,7 @@ jobs:
           bundler-cache: true
       - name: Setup Play Store credentials
         run: |
-          cd mobile/android
           echo "${{ secrets.PLAY_STORE_JSON_KEY }}" > play-store-credentials.json
       - name: Build and Deploy
-        working-directory: mobile
         run: |
           bundle exec fastlane deploy
