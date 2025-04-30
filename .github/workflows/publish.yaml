@@ -83,7 +83,7 @@ jobs:
           mv key.properties mobile/android/
       - name: Setup Play Store credentials
         run: |
-          echo "${{ secrets.PLAY_STORE_JSON_KEY }}" > mobile/android/play-store-credentials.json
+          echo "${{ secrets.PLAY_STORE_JSON_KEY }}" > play-store-credentials.json
       - name: Build and Deploy
         run: |
           cd mobile
