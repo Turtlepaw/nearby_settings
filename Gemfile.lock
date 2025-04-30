@@ -172,7 +172,7 @@ GEM
     optparse (0.6.0)
     os (1.1.4)
     plist (3.7.2)
-    public_suffix (6.0.1)
+    public_suffix (6.0.2)
     rake (13.2.1)
     representable (3.2.0)
       declarative (< 0.1.0)
@@ -221,7 +221,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  fastlane
+  fastlane (~> 2.227.1)
 
 BUNDLED WITH
    2.6.8
