@@ -67,3 +67,6 @@ tv_core/.gradle/config.properties
 example/release
 
 docs/node_modules
+
+# for publishing to google play
+play-store-credentials.json

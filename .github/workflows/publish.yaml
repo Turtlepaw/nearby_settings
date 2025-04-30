@@ -38,6 +38,34 @@ jobs:
         with:
           flutter-version: "3.29.3"
           channel: "stable"
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.0"
+          bundler-cache: true
+      - name: Setup Fastlane
+        run: |
+          gem install bundler
+          bundle install
+      - name: Setup Gradle Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-mobile-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-mobile-
+      - name: Setup Flutter Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache 
+            mobile/.dart_tool
+            mobile/build
+          key: ${{ runner.os }}-flutter-${{ hashFiles('mobile/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
       - name: Create keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mobile/android/app/key.jks
@@ -50,11 +78,22 @@ jobs:
           storeFile=key.jks
           EOF
           mv key.properties mobile/android/
-      - name: Build APK
+      - name: Setup Play Store credentials
+        run: |
+          echo "${{ secrets.PLAY_STORE_JSON_KEY }}" > mobile/android/play-store-credentials.json
+      - name: Build and Deploy
         run: |
           cd mobile
           flutter pub get
           flutter build apk --release
+          flutter build appbundle --release
+          cd android
+          bundle exec fastlane deploy
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-aab
+          path: mobile/build/app/outputs/bundle/release/app-release.aab
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
