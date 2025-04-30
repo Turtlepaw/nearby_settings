@@ -293,9 +293,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CircularProgressIndicator(
-              year2023: false,
-            ),
+            CircularProgressIndicator(),
             SizedBox(height: 16),
             Text('Loading settings...'),
           ],
@@ -397,9 +395,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(
-                    year2023: false,
-                  ),
+                  CircularProgressIndicator(),
                   SizedBox(height: 16),
                   Text('Loading app details...'),
                 ],

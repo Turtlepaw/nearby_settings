@@ -130,7 +130,7 @@ class _HomePageState extends State<HomePage> {
           bottom: isDiscovering
               ? PreferredSize(
                   preferredSize: const Size.fromHeight(2.0),
-                  child: LinearProgressIndicator(year2023: false,),
+                  child: LinearProgressIndicator(),
                 )
               : null,
           actions: [
@@ -201,7 +201,7 @@ class _HomePageState extends State<HomePage> {
                             SizedBox(
                               height: 35,
                               width: 35,
-                              child: CircularProgressIndicator(year2023: false, strokeWidth: 3,),
+                              child: CircularProgressIndicator(strokeWidth: 3,),
                             )
                         ],
                       ),
