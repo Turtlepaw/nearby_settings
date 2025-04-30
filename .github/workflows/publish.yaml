@@ -68,13 +68,17 @@ jobs:
           mv key.properties mobile/android/
       - name: Setup Play Store credentials
         run: |
-          echo "${{ secrets.PLAY_STORE_JSON_KEY }}" > play-store-credentials.json
-      - name: Validate Play Store JSON Key
+          echo '${{ secrets.PLAY_STORE_JSON_KEY }}' > play-store-credentials.json
+      - name: Validate Play Store JSON
         run: |
-          if ! jq empty play-store-credentials.json; then
-            echo "Invalid JSON in play-store-credentials.json"
+          cat play-store-credentials.json | jq empty
+          echo "JSON validation successful"
+          echo "Checking required fields..."
+          if ! jq -e 'has("type") and has("project_id") and has("private_key")' play-store-credentials.json > /dev/null; then
+            echo "Error: Missing required fields in credentials JSON"
             exit 1
           fi
+          echo "Required fields present"
       - name: Build
         working-directory: mobile
         run: |
