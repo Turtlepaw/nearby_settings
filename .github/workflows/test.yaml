@@ -4,8 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-mobile:
-    needs: version
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Ruby
