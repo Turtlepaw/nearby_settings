@@ -38,6 +38,7 @@ jobs:
         with:
           flutter-version: "3.29.3"
           channel: "stable"
+          cache: true
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -50,25 +51,6 @@ jobs:
       #     gem install bundler
       #     bundle lock --add-platform x86_64-linux
       #     bundle install
-      - name: Setup Gradle Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-mobile-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-mobile-
-      - name: Setup Flutter Cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.pub-cache 
-            mobile/.dart_tool
-            mobile/build
-          key: ${{ runner.os }}-flutter-${{ hashFiles('mobile/pubspec.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-flutter-
       - name: Create keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mobile/android/app/key.jks
