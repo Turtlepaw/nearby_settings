@@ -43,12 +43,13 @@ jobs:
         with:
           ruby-version: "3.4.2"
           bundler-cache: true
-      - name: Setup Fastlane
-        run: |
-          cd mobile/android
-          gem install bundler
-          bundle lock --add-platform x86_64-linux
-          bundle install
+          # setup ruby should do this
+      # - name: Setup Fastlane
+      #   run: |
+      #     cd mobile/android
+      #     gem install bundler
+      #     bundle lock --add-platform x86_64-linux
+      #     bundle install
       - name: Setup Gradle Cache
         uses: actions/cache@v4
         with:
