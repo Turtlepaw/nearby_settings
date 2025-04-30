@@ -65,16 +65,11 @@ jobs:
           mv key.properties mobile/android/
       - name: Setup Play Store credentials
         run: |
+          cd mobile/android
           echo "${{ secrets.PLAY_STORE_JSON_KEY }}" > play-store-credentials.json
-      - name: Verify Play Store credentials
-        run: |
-          if [ ! -f play-store-credentials.json ]; then
-            echo "Play Store credentials file not found!"
-            exit 1
-          fi
       - name: Build and Deploy
+        working-directory: mobile
         run: |
-          cd mobile
           flutter pub get
           flutter build apk --release
           flutter build appbundle --release
