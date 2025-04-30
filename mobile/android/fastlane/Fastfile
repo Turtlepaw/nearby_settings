@@ -6,7 +6,7 @@ platform :android do
     upload_to_play_store(
       track: 'internal',
       aab: '../build/app/outputs/bundle/release/app-release.aab',
-      json_key: 'play-store-credentials.json'
+      json_key: '../../play-store-credentials.json'
     )
   end
 end
