@@ -84,6 +84,12 @@ jobs:
       - name: Setup Play Store credentials
         run: |
           echo "${{ secrets.PLAY_STORE_JSON_KEY }}" > play-store-credentials.json
+      - name: Verify Play Store credentials
+        run: |
+          if [ ! -f play-store-credentials.json ]; then
+            echo "Play Store credentials file not found!"
+            exit 1
+          fi
       - name: Build and Deploy
         run: |
           cd mobile
@@ -104,7 +110,8 @@ jobs:
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
 
   build-example:
-    needs: version
+    # make it run after build-mobile
+    needs: [version, build-mobile]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
