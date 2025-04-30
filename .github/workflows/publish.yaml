@@ -69,6 +69,12 @@ jobs:
       - name: Setup Play Store credentials
         run: |
           echo "${{ secrets.PLAY_STORE_JSON_KEY }}" > play-store-credentials.json
+      - name: Validate Play Store JSON Key
+        run: |
+          if ! jq empty play-store-credentials.json; then
+            echo "Invalid JSON in play-store-credentials.json"
+            exit 1
+          fi
       - name: Build
         working-directory: mobile
         run: |
