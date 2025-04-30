@@ -44,13 +44,6 @@ jobs:
         with:
           ruby-version: "3.4.2"
           bundler-cache: true
-          # setup ruby should do this
-      # - name: Setup Fastlane
-      #   run: |
-      #     cd mobile/android
-      #     gem install bundler
-      #     bundle lock --add-platform x86_64-linux
-      #     bundle install
       - name: Create keystore
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mobile/android/app/key.jks
@@ -65,15 +58,15 @@ jobs:
           mv key.properties mobile/android/
       - name: Setup Play Store credentials
         run: |
-          cd mobile/android
           echo "${{ secrets.PLAY_STORE_JSON_KEY }}" > play-store-credentials.json
-      - name: Build and Deploy
+      - name: Build
         working-directory: mobile
         run: |
           flutter pub get
           flutter build apk --release
           flutter build appbundle --release
-          cd android
+      - name: Deploy AAB
+        run: |
           bundle exec fastlane deploy
       - name: Upload AAB
         uses: actions/upload-artifact@v4
